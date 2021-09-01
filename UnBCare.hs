@@ -88,9 +88,15 @@ medicamentos, retorne a quantidade desse medicamento no estoque.
 Se o medicamento não existir, retorne 0.
 
 -}
-
+-- consultarMedicamento :: Medicamento -> EstoqueMedicamentos -> Quantidade
+-- consultarMedicamento = undefined
 consultarMedicamento :: Medicamento -> EstoqueMedicamentos -> Quantidade
-consultarMedicamento = undefined
+consultarMedicamento [] [] = 0 
+consultarMedicamento (_:_) [] = 0
+consultarMedicamento medicamento (x:xs)
+   |  not (null result) =  snd (head result)
+   |  otherwise  = 0
+   where result = buscaNaLista medicamento (x:xs)
 
 
 {-
