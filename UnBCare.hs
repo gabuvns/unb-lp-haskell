@@ -112,8 +112,9 @@ consultarMedicamento medicamento (x:xs)
 
 -}
 
-demandaMedicamentos :: Receituario -> EstoqueMedicamentos
-demandaMedicamentos = undefined
+-- remover o argumento "receituario" foi sugestão da extensão de haskell, achei roubado
+demandaMedicamentos :: Receituario -> EstoqueMedicamentos 
+demandaMedicamentos  = map (\ (med, horarios) -> (med, length horarios))
 
 
 {-
