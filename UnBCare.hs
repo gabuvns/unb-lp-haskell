@@ -129,12 +129,28 @@ demandaMedicamentos  = map (\ (med, horarios) -> (med, length horarios))
  Defina as funções "receituarioValido" e "planoValido" que verifiquem as propriedades acima e cujos tipos são dados abaixo:
 
  -}
+todosDiferentes :: (Eq a) => [a] -> Bool 
+todosDiferentes [] = True
+todosDiferentes (x:xs) = x `notElem` xs && todosDiferentes xs
+
+ordenado :: (Ord a) => [a] -> Bool 
+ordenado [] = True 
+ordenado [x] = True
+ordenado (x:y:xs) = x < y && ordenado (y:xs)
 
 receituarioValido :: Receituario -> Bool
-receituarioValido = undefined
+receituarioValido receituario
+   |  ordenado med && all ordenado horarios = True 
+   |  otherwise  = False
+   where med = map fst receituario 
+         horarios = map snd receituario
 
 planoValido :: PlanoMedicamento -> Bool
-planoValido = undefined
+planoValido plano 
+   | all ordenado medicamentos && ordenado horario = True 
+   | otherwise = False 
+   where horario = map fst plano
+         medicamentos = map snd plano
 
 
 {-
