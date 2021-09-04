@@ -166,9 +166,49 @@ planoValido plano
  Defina a função "plantaoValido" que verifica as propriedades acima e cujo tipo é dado abaixo:
 
  -}
+ 
 
+--  Cumpre a primeira condição ou não, semelhante ao planoValido
+plantaoHorarioValido :: Plantao -> Bool
+plantaoHorarioValido plantao 
+   | ordenado horario = True 
+   | otherwise = False 
+   where horario = map fst plantao
+
+-- Segunda condicao
+boolList tupla 
+   |  fst tupla == snd tupla = True
+   |  otherwise  = False
+
+checkBoolLista xs = if all (== False) xs then True else False
+   
+plantaoComprarMedicarValido :: Plantao -> Bool
+plantaoComprarMedicarValido plantao = rst
+   where item = map snd plantao
+         -- Separamos medicar / comprar
+         medicarLista = map (filter medicarConst ) item
+         comprarLista = map (filter comprarConst) item
+         -- Construtores para podermos filtrar somente o medicar/comprar
+         medicarConst (Medicar _) = True
+         medicarConst _ = False
+         comprarConst (Comprar _ _) = True
+         comprarConst _ = False
+         -- Nós limpamos o elemento da lista para ficar somente o nome de cada remedio
+         medicarLimpo = map (map (\(Medicar m) -> m)) medicarLista
+         comprarLimpo = map (map (\(Comprar m _) -> m)) comprarLista
+         -- Juntamos ambas as listas
+         zipado = zip medicarLimpo comprarLimpo
+         -- Criamos um vetor para verificar se os elementos existem em comprar e medicar
+         result = map boolList zipado
+         -- Verificamos se todos são false (nao existem no mesmo horario)
+         rst = checkBoolLista result   
+      
+-- Funcao principal
 plantaoValido :: Plantao -> Bool
-plantaoValido = undefined
+plantaoValido plantao 
+   |  plantaoHorarioValido plantao && plantaoComprarMedicarValido plantao = True 
+   |  otherwise = False 
+   
 
 
 {-
