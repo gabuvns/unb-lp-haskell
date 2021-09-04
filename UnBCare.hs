@@ -44,15 +44,15 @@ Caso o remédio ainda não exista no estoque, o novo estoque a ser retornado dev
 --    where (_,estoqueExistente) = head estoqueMedicamento
 
 -- Retorna lista vazia caso o medicamento nao exista
-buscaNaLista :: Medicamento -> EstoqueMedicamentos -> EstoqueMedicamentos 
+buscaNaLista :: Medicamento -> EstoqueMedicamentos -> EstoqueMedicamentos
 buscaNaLista medicamento estoque = [tupla | tupla <- estoque, fst tupla == medicamento]
 
 comprarMedicamento :: Medicamento -> Quantidade -> EstoqueMedicamentos -> EstoqueMedicamentos
 comprarMedicamento medicamento quantidade [] = [(medicamento, quantidade)]
-comprarMedicamento medicamento quantidade ((medEst,qtdEst):xs) 
+comprarMedicamento medicamento quantidade ((medEst,qtdEst):xs)
    | null (buscaNaLista medicamento ((medEst,qtdEst):xs)) = (medicamento, quantidade):((medEst,qtdEst):xs)
    | medicamento == medEst = (medicamento, quantidade+qtdEst):xs
-   | otherwise =  (medEst,qtdEst) : comprarMedicamento medicamento quantidade xs 
+   | otherwise =  (medEst,qtdEst) : comprarMedicamento medicamento quantidade xs
 
 {-
    QUESTÃO 2, VALOR: 1,0 ponto
@@ -67,14 +67,14 @@ onde v é o novo estoque.
 buscaListaBool :: Medicamento -> EstoqueMedicamentos -> Bool
 buscaListaBool _ [] = False
 buscaListaBool medicamento  (x:xs)
-   |  medicamento == fst x = True 
+   |  medicamento == fst x = True
    |  otherwise  = buscaListaBool medicamento xs
-   
+
 medicamentoDisponivel :: Medicamento -> EstoqueMedicamentos  -> EstoqueMedicamentos
 medicamentoDisponivel medicamento estoque = [tupla | tupla <- estoque, fst tupla == medicamento && snd tupla >= 1]
 
 tomarMedicamento :: Medicamento -> EstoqueMedicamentos -> Maybe EstoqueMedicamentos
-tomarMedicamento [] [] = Nothing 
+tomarMedicamento [] [] = Nothing
 tomarMedicamento (_:_) [] = Nothing
 tomarMedicamento medicamento (x:xs)
    | buscaListaBool medicamento (x:xs) && not (null (medicamentoDisponivel medicamento (x:xs))) = Just $ map(\x -> if fst x  == medicamento && snd x >=1 then (fst x, snd x -1) else x) (x:xs)
@@ -91,7 +91,7 @@ Se o medicamento não existir, retorne 0.
 -- consultarMedicamento :: Medicamento -> EstoqueMedicamentos -> Quantidade
 -- consultarMedicamento = undefined
 consultarMedicamento :: Medicamento -> EstoqueMedicamentos -> Quantidade
-consultarMedicamento [] [] = 0 
+consultarMedicamento [] [] = 0
 consultarMedicamento (_:_) [] = 0
 consultarMedicamento medicamento (x:xs)
    |  not (null result) =  snd (head result)
@@ -113,7 +113,7 @@ consultarMedicamento medicamento (x:xs)
 -}
 
 -- remover o argumento "receituario" foi sugestão da extensão de haskell, achei roubado
-demandaMedicamentos :: Receituario -> EstoqueMedicamentos 
+demandaMedicamentos :: Receituario -> EstoqueMedicamentos
 demandaMedicamentos  = map (\ (med, horarios) -> (med, length horarios))
 
 
@@ -129,26 +129,26 @@ demandaMedicamentos  = map (\ (med, horarios) -> (med, length horarios))
  Defina as funções "receituarioValido" e "planoValido" que verifiquem as propriedades acima e cujos tipos são dados abaixo:
 
  -}
-todosDiferentes :: (Eq a) => [a] -> Bool 
+todosDiferentes :: (Eq a) => [a] -> Bool
 todosDiferentes [] = True
 todosDiferentes (x:xs) = x `notElem` xs && todosDiferentes xs
 
-ordenado :: (Ord a) => [a] -> Bool 
-ordenado [] = True 
+ordenado :: (Ord a) => [a] -> Bool
+ordenado [] = True
 ordenado [x] = True
 ordenado (x:y:xs) = x < y && ordenado (y:xs)
 
 receituarioValido :: Receituario -> Bool
 receituarioValido receituario
-   |  ordenado med && all ordenado horarios = True 
+   |  ordenado med && all ordenado horarios = True
    |  otherwise  = False
-   where med = map fst receituario 
+   where med = map fst receituario
          horarios = map snd receituario
 
 planoValido :: PlanoMedicamento -> Bool
-planoValido plano 
-   | all ordenado medicamentos && ordenado horario = True 
-   | otherwise = False 
+planoValido plano
+   | all ordenado medicamentos && ordenado horario = True
+   | otherwise = False
    where horario = map fst plano
          medicamentos = map snd plano
 
@@ -166,24 +166,24 @@ planoValido plano
  Defina a função "plantaoValido" que verifica as propriedades acima e cujo tipo é dado abaixo:
 
  -}
- 
+
 
 --  Cumpre a primeira condição ou não, semelhante ao planoValido
 plantaoHorarioValido :: Plantao -> Bool
-plantaoHorarioValido plantao 
-   | ordenado horario = True 
-   | otherwise = False 
+plantaoHorarioValido plantao
+   | ordenado horario = True
+   | otherwise = False
    where horario = map fst plantao
 
 -- Segunda condicao
-boolList tupla 
+boolList tupla
    |  fst tupla == snd tupla = True
    |  otherwise  = False
 
 checkBoolLista xs = if all (== False) xs then True else False
-   
+
 plantaoComprarMedicarValido :: Plantao -> Bool
-plantaoComprarMedicarValido plantao = rst
+plantaoComprarMedicarValido plantao = result
    where item = map snd plantao
          -- Separamos medicar / comprar
          medicarLista = map (filter medicarConst ) item
@@ -199,16 +199,16 @@ plantaoComprarMedicarValido plantao = rst
          -- Juntamos ambas as listas
          zipado = zip medicarLimpo comprarLimpo
          -- Criamos um vetor para verificar se os elementos existem em comprar e medicar
-         result = map boolList zipado
+         booleanListResult = map boolList zipado
          -- Verificamos se todos são false (nao existem no mesmo horario)
-         rst = checkBoolLista result   
-      
+         result = checkBoolLista booleanListResult
+
 -- Funcao principal
+-- O caso plantaoInvalido4 FALHA pois ele nao compara todos os elementos com todos, infelizmente não consegui fazer isso
 plantaoValido :: Plantao -> Bool
-plantaoValido plantao 
-   |  plantaoHorarioValido plantao && plantaoComprarMedicarValido plantao = True 
-   |  otherwise = False 
-   
+plantaoValido plantao
+   |  plantaoHorarioValido plantao && plantaoComprarMedicarValido plantao = True
+   |  otherwise = False
 
 
 {-
@@ -222,8 +222,18 @@ plantaoValido plantao
 
 -}
 
-geraPlanoReceituario :: Receituario -> PlanoMedicamento
-geraPlanoReceituario = undefined
+-- expandeLista :: Prescricao -> [(Medicamento, Horario )]
+-- expandeLista ([], []) = []
+-- expandeLista ((_:_), []) = []
+-- expandeLista (medicamento, x:xs) = (medicamento, x):expandeLista (medicamento, xs)
+
+-- Três passos: 
+-- Gerar array para cada medicamento de cara hora
+-- Reagrupar baseando no horario
+-- geraPlanoReceituario :: Receituario -> PlanoMedicamento
+geraPlanoReceituario [] = []
+geraPlanoReceituario receituario = undefined
+   -- where result = map expandeLista receituario
 
 
 {- QUESTÃO 8  VALOR: 1,0 ponto
