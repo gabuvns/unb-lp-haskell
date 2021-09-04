@@ -222,18 +222,78 @@ plantaoValido plantao
 
 -}
 
--- expandeLista :: Prescricao -> [(Medicamento, Horario )]
--- expandeLista ([], []) = []
--- expandeLista ((_:_), []) = []
--- expandeLista (medicamento, x:xs) = (medicamento, x):expandeLista (medicamento, xs)
+expandeLista :: Prescricao -> [(Medicamento, Horario )]
+expandeLista ([], []) = []
+expandeLista ((_:_), []) = []
+expandeLista (medicamento, x:xs) = (medicamento, x):expandeLista (medicamento, xs)
 
 -- Três passos: 
 -- Gerar array para cada medicamento de cara hora
 -- Reagrupar baseando no horario
--- geraPlanoReceituario :: Receituario -> PlanoMedicamento
+-- auxFunc :: Receituario -> PlanoMedicamento
+
+-- Implementando uma funcao para agrupar
+-- https://stackoverflow.com/questions/45654216/haskell-groupby-function-how-exactly-does-it-work
+groupBy :: (a -> a -> Bool) -> [a] -> [[a]]
+groupBy _  []     =  []
+groupBy eq (x:xs) =  (x:ys) : groupBy eq zs
+    where (ys,zs) = span (eq x) xs
+
+inverte :: (a,b) -> (b,a)
+inverte (a,b) = (b,a)
+
+-- quicksort
+-- https://smthngsmwhr.wordpress.com/2012/11/09/sorting-algorithms-in-haskell/
+quicksort :: (Ord a) => [a] -> [a]
+quicksort [] = []
+quicksort (x:xs) = quicksort [y | y <- xs, y <= x] ++ [x] ++ quicksort [y | y <- xs, y > x]
+
+pegaHorarios :: [(a, b)] -> [b]
+pegaHorarios lista = resultado
+   where resultado =  map snd lista
+      
+
+-- pegaHora' lista = 
+   
+pegaMedicamentos :: [(b1, b2)] -> [b1]
+pegaMedicamentos lista = map fst lista
+
+
+-- https://stackoverflow.com/questions/8227218/removing-repeated-elements-from-a-list-in-haskell
+removeDuplicata :: (Ord a, Eq a) => [a] -> [a]
+removeDuplicata xs = remove $ quicksort xs
+  where
+    remove []  = []
+    remove [x] = [x]
+    remove (x1:x2:xs)
+      | x1 == x2  = remove (x1:xs)
+      | otherwise = x1 : remove (x2:xs)
+      
+geraPlanoReceituario :: Receituario -> PlanoMedicamento
 geraPlanoReceituario [] = []
-geraPlanoReceituario receituario = undefined
-   -- where result = map expandeLista receituario
+geraPlanoReceituario receituario = resultado
+   where expandida = map expandeLista receituario
+         flat = concat expandida
+         -- Invertemos a tupla
+         flatInv = map inverte flat
+         -- Fazemos um sort usando o primeiro elemento da tupla
+         sortedFlatInv = quicksort flatInv
+         -- Invertemos novamente para a posicao normal para poder agrupar
+         sortedFlat = map inverte sortedFlatInv
+         -- Agrupamos os elementos 
+         -- Em seguida agrupamos os elementos
+         groupedFlat = groupBy (\a b -> snd a == snd b) sortedFlat
+         -- Separamos os medicamentos
+         listaMedicamentos = map pegaMedicamentos groupedFlat 
+         -- Separamos os horarios
+         listaHorarios = map pegaHorarios groupedFlat
+         -- Concatenamos eles
+         concatHorarios = concat listaHorarios
+         -- limpamos de duplicatas
+         uniqueList = removeDuplicata concatHorarios
+         -- Temos já a certeza que as listas seram do mesmo tamanho, logo:
+         resultado = zip uniqueList listaMedicamentos
+
 
 
 {- QUESTÃO 8  VALOR: 1,0 ponto
