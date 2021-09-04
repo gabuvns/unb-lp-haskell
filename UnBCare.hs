@@ -345,7 +345,8 @@ deve ser Just v, onde v é o valor final do estoque de medicamentos
 -}
 
 executaPlantao :: Plantao -> EstoqueMedicamentos -> Maybe EstoqueMedicamentos
-executaPlantao = undefined
+executaPlantao [] estoque = Just estoque
+executaPlantao plantao estoque = Nothing
 
 
 {-
@@ -361,7 +362,7 @@ juntamente com ministrar medicamento.
 -}
 
 satisfaz :: Plantao -> PlanoMedicamento -> EstoqueMedicamentos  -> Bool
-satisfaz = undefined
+satisfaz plantao plano estoque = True
 
 
 {-
