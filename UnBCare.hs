@@ -38,11 +38,6 @@ Caso o remédio ainda não exista no estoque, o novo estoque a ser retornado dev
 
 -}
 
--- comprarMedicamento medicamento quantidade estoqueMedicamento 
---    |  estoqueMedicamento /= [] = [(medicamento, quantidade+estoqueExistente)]
---    |  otherwise           = [(medicamento, quantidade)]
---    where (_,estoqueExistente) = head estoqueMedicamento
-
 -- Retorna lista vazia caso o medicamento nao exista
 buscaNaLista :: Medicamento -> EstoqueMedicamentos -> EstoqueMedicamentos
 buscaNaLista medicamento estoque = [tupla | tupla <- estoque, fst tupla == medicamento]
@@ -88,8 +83,7 @@ medicamentos, retorne a quantidade desse medicamento no estoque.
 Se o medicamento não existir, retorne 0.
 
 -}
--- consultarMedicamento :: Medicamento -> EstoqueMedicamentos -> Quantidade
--- consultarMedicamento = undefined
+
 consultarMedicamento :: Medicamento -> EstoqueMedicamentos -> Quantidade
 consultarMedicamento [] [] = 0
 consultarMedicamento (_:_) [] = 0
