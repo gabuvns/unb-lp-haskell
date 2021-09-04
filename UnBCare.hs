@@ -225,12 +225,11 @@ plantaoValido plantao
 expandeLista :: Prescricao -> [(Medicamento, Horario )]
 expandeLista ([], []) = []
 expandeLista ((_:_), []) = []
-expandeLista (medicamento, x:xs) = (medicamento, x):expandeLista (medicamento, xs)
+expandeLista (a, x:xs) = (a, x):expandeLista (a, xs)
 
 -- Três passos: 
 -- Gerar array para cada medicamento de cara hora
 -- Reagrupar baseando no horario
--- auxFunc :: Receituario -> PlanoMedicamento
 
 -- Implementando uma funcao para agrupar
 -- https://stackoverflow.com/questions/45654216/haskell-groupby-function-how-exactly-does-it-work
@@ -254,7 +253,6 @@ pegaHorarios lista = resultado
       
 
 -- pegaHora' lista = 
-   
 pegaMedicamentos :: [(b1, b2)] -> [b1]
 pegaMedicamentos lista = map fst lista
 
@@ -305,10 +303,37 @@ geraPlanoReceituario receituario = resultado
  geraReceituarioPlano com base em geraPlanoReceituario ?
 
 -}
+-- Entendi a relação entre a questão 7 e 8, entretando não consegui demonstrar
+-- Essa relação através do código, a questão foi basicamente control c + control v
+
+expandeListaPlano :: (Horario,[Medicamento]) -> [(Horario, Medicamento)]
+expandeListaPlano (_, []) = []
+expandeListaPlano (a, x:xs) = (a, x) : expandeListaPlano (a, xs)
 
 geraReceituarioPlano :: PlanoMedicamento -> Receituario
-geraReceituarioPlano = undefined
-
+geraReceituarioPlano planoMedicamento = resultado
+   where expandida = map expandeListaPlano planoMedicamento
+         flat = concat expandida
+         -- -- Invertemos a tupla
+         flatInv = map inverte flat
+         -- -- Fazemos um sort usando o primeiro elemento da tupla
+         sortedFlatInv = quicksort flatInv
+         -- -- Invertemos novamente para a posicao normal para poder agrupar
+         sortedFlat = map inverte sortedFlatInv
+         -- -- Agrupamos os elementos 
+         -- -- Em seguida agrupamos os elementos
+         groupedFlat = groupBy (\a b -> snd a == snd b) sortedFlat
+         -- -- Separamos os medicamentos
+         listaMedicamentos = map pegaMedicamentos groupedFlat 
+         -- -- Separamos os horarios
+         listaHorarios = map pegaHorarios groupedFlat
+         -- -- Concatenamos eles
+         concatHorarios = concat listaHorarios
+         -- -- limpamos de duplicatas
+         uniqueList = removeDuplicata concatHorarios
+         -- -- Temos já a certeza que as listas seram do mesmo tamanho, logo:
+         resultado = zip uniqueList listaMedicamentos
+  
 
 {-  QUESTÃO 9 VALOR: 1,0 ponto
 
